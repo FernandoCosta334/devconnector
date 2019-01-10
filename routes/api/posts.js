@@ -23,7 +23,7 @@ router.get("/", (req, res) => {
   Post.find()
     .sort({ date: -1 })
     .then(posts => res.json(posts))
-    .catch(err => res.status(404).json({ nopostfound: "No post found" }));
+    .catch(err => res.status(404).json({ nopostsfound: "No posts found" }));
 });
 
 // @Route   GET api/posts/:id
@@ -60,17 +60,37 @@ router.post("/", passport.authenticate("jwt", { session: false }), (req, res) =>
 // @Route   DELETE api/posts/:id
 // @Desc    Delete Post
 // @Access  Private
-router.delete("/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
-  Profile.findOne({ user: re.user.id }).then(profile => {
+router.delete("/:id", passport.authenticate("jwt", { session: false }), (que, res) => {
+  Profile.findOne({ user: req.user.id }).then(profile => {
     Post.findById(req.params.id)
       .then(post => {
-        // Check for post owner
+        //Check for post owner
         if (post.user.toString() !== req.user.id) {
           return res.status(401).json({ notauthorized: "User not authorized" });
         }
 
-        // Delete
+        //Delete
         post.remove().then(() => res.json({ success: true }));
+      })
+
+      .catch(err => res.status(404).json({ postnotfound: " No post found" }));
+  });
+});
+
+// @Route   POST api/posts/like/:id
+// @Desc    add like to a Post
+// @Access  Private
+router.post("/like/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
+  Profile.findOne({ user: req.user.id }).then(profile => {
+    Post.findById(req.params.id)
+      .then(post => {
+        if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+          return res.status(400).json({ alreadyliked: "User Already liked this post" });
+        }
+
+        // Add user id to likes away
+        post.likes.unshift({ user: req.user.id });
+        post.save().then(post => res.json(post));
       })
       .catch(err => res.status(404).json({ postnofound: "No post found" }));
   });
