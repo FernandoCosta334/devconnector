@@ -18,7 +18,7 @@ const User = require("../../models/users");
 // @Access  Public
 router.get("/test", (req, res) => res.json({ msg: "Users Works" }));
 
-// @Route   GET api/users/register
+// @Route   POST api/users/register
 // @Desc    Register user
 // @Access  Public
 router.post("/register", (req, res) => {
@@ -89,17 +89,12 @@ router.post("/login", (req, res) => {
         //User Match
         const payload = { id: user.id, name: user.name, avatar: user.avatar }; //Create jwt payload
         //Sign token
-        jwt.sign(
-          payload,
-          keys.secretOrKey,
-          { expiresIn: 3600 },
-          (err, token) => {
-            res.json({
-              success: true,
-              token: "Bearer " + token
-            });
-          }
-        );
+        jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
+          res.json({
+            success: true,
+            token: "Bearer " + token
+          });
+        });
       } else {
         errors.password = "Password incorrect";
         return res.status(400).json(errors);
@@ -111,16 +106,12 @@ router.post("/login", (req, res) => {
 // @Route   GET api/users/current
 // @Desc    return current user
 // @Access  private
-router.get(
-  "/current",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.json({
-      id: req.user.id,
-      name: req.user.name,
-      email: req.user.email
-    });
-  }
-);
+router.get("/current", passport.authenticate("jwt", { session: false }), (req, res) => {
+  res.json({
+    id: req.user.id,
+    name: req.user.name,
+    email: req.user.email
+  });
+});
 
 module.exports = router;
