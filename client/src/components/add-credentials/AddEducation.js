@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { addEducation } from "../../actions/profileActions";
 
-class addEducation extends Component {
+class AddEducation extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -35,7 +35,7 @@ class addEducation extends Component {
   onSubmit(e) {
     e.preventDefault();
     const eduData = {
-      scholl: this.state.scholl,
+      school: this.state.school,
       degree: this.state.degree,
       fieldofstudy: this.state.fieldofstudy,
       from: this.state.from,
@@ -118,7 +118,7 @@ class addEducation extends Component {
                     id="current"
                   />
                   <label htmlFor="current" className="form-check-label">
-                    Current Job
+                    Current school
                   </label>
                 </div>
                 <TextAreaFieldGroup
@@ -145,7 +145,7 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-addEducation.propTypes = {
+AddEducation.propTypes = {
   addEducation: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -154,4 +154,4 @@ addEducation.propTypes = {
 export default connect(
   mapStateToProps,
   { addEducation }
-)(withRouter(addEducation));
+)(withRouter(AddEducation));
